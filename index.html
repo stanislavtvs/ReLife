@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReLife — умная система возрождения вещей</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f6f6f6;
+    color: #222;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background: #4CAF50;
+    color: white;
+    padding: 20px 0;
+  }
+  main {
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+  }
+  .upload {
+    border: 2px dashed #4CAF50;
+    padding: 30px;
+    background: white;
+    margin: 20px 0;
+    cursor: pointer;
+  }
+  #preview {
+    max-width: 100%;
+    margin-top: 15px;
+  }
+  .hidden {
+    display: none;
+  }
+  #loading {
+    font-weight: bold;
+    color: #4CAF50;
+    margin: 20px 0;
+  }
+  #result {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+  #qr {
+    margin-top: 20px;
+  }
+  button {
+    background: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  button:hover {
+    background: #43a047;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>ReLife</h1>
+  <p>Умная система возрождения вещей</p>
+</header>
+
+<main>
+  <h2>📦 Загрузите фото ненужной вещи</h2>
+  <input type="file" id="fileInput" accept="image/*" class="hidden">
+  <div class="upload" id="uploadBox">Нажмите, чтобы выбрать фото</div>
+  <img id="preview" class="hidden">
+
+  <div id="loading" class="hidden">ИИ анализирует вещь...</div>
+
+  <div id="result" class="hidden"></div>
+  <div id="qr" class="hidden"></div>
+
+  <button id="resetBtn" class="hidden">Начать заново</button>
+</main>
+
+<!-- QR генератор -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const uploadBox = document.getElementById('uploadBox');
+  const preview = document.getElementById('preview');
+  const loading = document.getElementById('loading');
+  const result = document.getElementById('result');
+  const qr = document.getElementById('qr');
+  const resetBtn = document.getElementById('resetBtn');
+
+  const options = [
+    "🛍 Продайте её на маркетплейсе секонд-хенда",
+    "♻️ Сдайте на переработку",
+    "💚 Пожертвуйте в благотворительный фонд"
+  ];
+
+  uploadBox.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      preview.src = ev.target.result;
+      preview.classList.remove('hidden');
+      analyzeItem();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function analyzeItem() {
+    uploadBox.classList.add('hidden');
+    loading.classList.remove('hidden');
+
+    setTimeout(() => {
+      loading.classList.add('hidden');
+
+      const choice = options[Math.floor(Math.random() * options.length)];
+      result.innerHTML = `<strong>Результат анализа:</strong><br>${choice}`;
+      result.classList.remove('hidden');
+
+      const codeText = "ReLife QR: " + choice;
+      qr.classList.remove('hidden');
+      qr.innerHTML = "";
+      new QRCode(qr, { text: codeText, width: 128, height: 128 });
+
+      resetBtn.classList.remove('hidden');
+    }, 2000);
+  }
+
+  resetBtn.addEventListener('click', () => {
+    fileInput.value = "";
+    uploadBox.classList.remove('hidden');
+    preview.classList.add('hidden');
+    result.classList.add('hidden');
+    qr.classList.add('hidden');
+    resetBtn.classList.add('hidden');
+  });
+</script>
+</body>
+</html>
